@@ -17,7 +17,7 @@ const Container = styled.div`
   flex: 0.45;
   border-right: 1px solid whitesmoke;
   height: 100vh;
-  min-width: 300px;
+  min-width: ${(props) => (props.mobile ? "100%" : "300px")};
   max-width: 350px;
   overflow-y: scroll;
 
@@ -90,7 +90,7 @@ const StartChatButton = styled(Button)`
   margin-top: 10px;
 `;
 
-const SideBar = () => {
+const SideBar = ({ mobile }) => {
   const [user] = useAuthState(auth);
   const userChatRef = db
     .collection("chats")
@@ -134,7 +134,7 @@ const SideBar = () => {
   };
 
   return (
-    <Container>
+    <Container mobile={mobile}>
       <Header>
         <AvatarContainer>
           <UserAvatar src={user.photoURL} onClick={signOut} />

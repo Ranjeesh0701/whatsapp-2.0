@@ -7,8 +7,6 @@ import { auth } from "../firebase";
 const Message = ({ user, message }) => {
   const [userLoggedIn] = useAuthState(auth);
 
-  console.log(user === userLoggedIn.email);
-
   const TypeOfMessage = user === userLoggedIn.email ? Sender : Receiver;
 
   return (
@@ -38,12 +36,12 @@ const MessageElement = styled.p`
   border-radius: 10px;
 `;
 
-const Receiver = styled(MessageElement)`
+const Sender = styled(MessageElement)`
   margin-left: auto;
   background-color: #dcf8c6;
 `;
 
-const Sender = styled(MessageElement)`
+const Receiver = styled(MessageElement)`
   text-align: left;
   background-color: whitesmoke;
 `;

@@ -4,7 +4,7 @@ import React, { useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import styled from "styled-components";
 import { auth, db } from "../firebase";
-import { InsertEmoticon, Mic, MoreVert } from "@mui/icons-material";
+import { ArrowBackIos, InsertEmoticon, Mic, MoreVert } from "@mui/icons-material";
 import { AttachFile } from "@mui/icons-material";
 import { useCollection } from "react-firebase-hooks/firestore";
 import Message from "./Message";
@@ -12,7 +12,7 @@ import firebase from "firebase/compat/app";
 import getRecipientEmail from "../utils/getRecipientEmail";
 import TimeAgo from "timeago-react";
 
-const ChatScreen = ({ chat, messages }) => {
+const ChatScreen = ({ chat, messages, mobile }) => {
   const [user] = useAuthState(auth);
 
   const [input, setInput] = useState("");
@@ -37,19 +37,21 @@ const ChatScreen = ({ chat, messages }) => {
 
   const showMessages = () => {
     if (messagesSnapshot) {
-      return messagesSnapshot.docs.map((message) => (
-        <Message
-          key={message.id}
-          user={message.data().user}
-          message={{
-            ...message.data(),
-            timestamp: message.data().timestamp?.toDate().getTime(),
-          }}
-        />
-      ));
+      return messagesSnapshot.docs.map((message) => {
+        return (
+          <Message
+            key={message.id}
+            user={message.data().email}
+            message={{
+              ...message.data(),
+              timestamp: message.data().timestamp?.toDate().getTime(),
+            }}
+          />
+        );
+      });
     } else {
       return JSON.parse(messages).map((message) => (
-        <Message key={message.id} user={message.user} message={message} />
+        <Message key={message.id} user={message.email} message={message} />
       ));
     }
   };
@@ -57,9 +59,9 @@ const ChatScreen = ({ chat, messages }) => {
   const scrollToBottom = () => {
     endOfMessagesRef.current.scrollIntoView({
       behavior: "smooth",
-      block: "start"
-    })
-  }
+      block: "start",
+    });
+  };
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -82,32 +84,47 @@ const ChatScreen = ({ chat, messages }) => {
     setInput("");
   };
 
+  const handleMobileBack = () => {
+    router.push("/");
+  }
+
   const recipient = recipientSnapshot?.docs?.[0]?.data();
   const recipientEmail = getRecipientEmail(chat.users, user);
 
   return (
     <Container>
       <Header>
-        {recipient ? (
-          <Avatar src={recipient?.photoURL} />
-        ) : (
-          <Avatar src={recipientEmail[0]} />
-        )}
-        <HeaderInformation>
-          <h3>{recipientEmail}</h3>
-          {recipientSnapshot ? (
-            <p>
-              Last active:{" "}
-              {recipient?.lastSeen?.toDate() ? (
-                <TimeAgo datetime={recipient?.lastSeen?.toDate()} />
-              ) : (
-                "Unavailable"
-              )}
-            </p>
+        <AvatarContainer mobile={mobile}>
+          {
+            mobile && (
+              <IconButton>
+                <ArrowBackIos onClick={handleMobileBack} />
+              </IconButton>
+            )
+          }
+          {recipient ? (
+            <Avatar src={recipient?.photoURL} />
           ) : (
-            <p>Loading last active...</p>
+            <Avatar src={recipientEmail[0]} />
           )}
-        </HeaderInformation>
+        </AvatarContainer>
+        {!mobile && (
+          <HeaderInformation>
+            <UserName>{recipientEmail}</UserName>
+            {recipientSnapshot ? (
+              <p>
+                Last active:{" "}
+                {recipient?.lastSeen?.toDate() ? (
+                  <TimeAgo datetime={recipient?.lastSeen?.toDate()} />
+                ) : (
+                  "Unavailable"
+                )}
+              </p>
+            ) : (
+              <p>Loading last active...</p>
+            )}
+          </HeaderInformation>
+        )}
         <HeaderIcons>
           <IconButton>
             <AttachFile />
@@ -197,4 +214,16 @@ const Input = styled.input`
   margin-left: 15px;
   margin-right: 15px;
   background-color: whitesmoke;
+`;
+
+const UserName = styled.h3`
+  width: 200px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
+const AvatarContainer = styled.div`
+  flex: ${(props) => props.mobile && 1};
+  display: flex;
 `;

@@ -1,5 +1,5 @@
 import Head from "next/head";
-import React from "react";
+import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import styled from "styled-components";
 import ChatScreen from "../../components/ChatScreen";
@@ -10,6 +10,19 @@ import getRecipientEmail from "../../utils/getRecipientEmail";
 const Chat = ({ messages, chat }) => {
   const [user] = useAuthState(auth);
   chat = JSON.parse(chat);
+
+  const [innerWidth, setInnerWidth] = useState(window.innerWidth);
+  const [mobile, setMobile] = useState(false);
+  window.addEventListener("resize", () => {
+    setInnerWidth(window.innerWidth);
+  });
+
+  if (innerWidth <= 579) {
+    if (!mobile) setMobile(true);
+  } else {
+    if (mobile) setMobile(false);
+  }
+
   return (
     <Container>
       <Head>
@@ -19,9 +32,9 @@ const Chat = ({ messages, chat }) => {
           href="https://logo-logos.com/2016/10/WhatsApp_logo_icon.png"
         />
       </Head>
-      <SideBar />
-      <ChatContainer>
-        <ChatScreen chat={chat} messages={messages} />
+      {!mobile && <SideBar />}
+      <ChatContainer mobile={mobile}>
+        <ChatScreen chat={chat} messages={messages} mobile={mobile} />
       </ChatContainer>
     </Container>
   );
@@ -68,6 +81,7 @@ const ChatContainer = styled.div`
   flex: 1;
   overflow: scroll;
   height: 100vh;
+  width: ${(props) => (props.mobile ? "100%" : "")};
 
   ::-webkit-scrollbar {
     display: none;
