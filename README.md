@@ -2,4 +2,4 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Whatsapp clone 2.0
 
-Open [http://ranjeesh-whatsapp-clone.herokuapp.com/](http://ranjeesh-whatsapp-clone.herokuapp.com/) with your browser to see the result.
+Open [https://ranjeesh-whatsapp-clone.vercel.app/](https://ranjeesh-whatsapp-clone.vercel.app/) with your browser to see the result.
